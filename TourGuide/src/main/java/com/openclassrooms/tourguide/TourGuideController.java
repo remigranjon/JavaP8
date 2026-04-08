@@ -1,6 +1,7 @@
 package com.openclassrooms.tourguide;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,7 +10,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import gpsUtil.location.Attraction;
 import gpsUtil.location.VisitedLocation;
+import rewardCentral.RewardCentral;
 
+import com.openclassrooms.tourguide.responses.AttractionInfoResponse;
+import com.openclassrooms.tourguide.service.RewardsService;
 import com.openclassrooms.tourguide.service.TourGuideService;
 import com.openclassrooms.tourguide.user.User;
 import com.openclassrooms.tourguide.user.UserReward;
@@ -19,8 +23,16 @@ import tripPricer.Provider;
 @RestController
 public class TourGuideController {
 
+   
+
 	@Autowired
 	TourGuideService tourGuideService;
+
+    @Autowired
+    RewardsService rewardsService;
+
+    @Autowired 
+    RewardCentral rewardCentral;
 	
     @RequestMapping("/")
     public String index() {
@@ -42,9 +54,15 @@ public class TourGuideController {
         // The reward points for visiting each Attraction.
         //    Note: Attraction reward points can be gathered from RewardsCentral
     @RequestMapping("/getNearbyAttractions") 
-    public List<Attraction> getNearbyAttractions(@RequestParam String userName) {
+    public List<AttractionInfoResponse> getNearbyAttractions(@RequestParam String userName) {
     	VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));
-    	return tourGuideService.getNearByAttractions(visitedLocation);
+    	return tourGuideService.getNearByAttractions(visitedLocation).stream().map((Attraction attraction) -> {
+			double distance = rewardsService.getDistance(attraction, visitedLocation.location);
+			return AttractionInfoResponse.builder().attractionName(attraction.attractionName)
+					.attractionLatitude(attraction.latitude).attractionLongitude(attraction.longitude)
+					.userLatitude(visitedLocation.location.latitude).userLongitude(visitedLocation.location.longitude)
+					.distanceInMiles(distance).rewardPoints(rewardCentral.getAttractionRewardPoints(attraction.attractionId, getUser(userName).getUserId())).build();
+		}).collect(Collectors.toList());
     }
     
     @RequestMapping("/getRewards") 
