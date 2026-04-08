@@ -62,7 +62,7 @@ public class User {
 	}
 	
 	public List<VisitedLocation> getVisitedLocations() {
-		return visitedLocations;
+		return new ArrayList<>(visitedLocations);
 	}
 	
 	public void clearVisitedLocations() {
@@ -70,13 +70,15 @@ public class User {
 	}
 	
 	public void addUserReward(UserReward userReward) {
-		if(userRewards.stream().filter(r -> !r.attraction.attractionName.equals(userReward.attraction)).count() == 0) {
+		boolean alreadyRewarded = userRewards.stream()
+                .anyMatch(r -> r.attraction.attractionName.equals(userReward.attraction.attractionName));
+		if (!alreadyRewarded) {
 			userRewards.add(userReward);
 		}
 	}
 	
 	public List<UserReward> getUserRewards() {
-		return userRewards;
+		return new ArrayList<>(userRewards);
 	}
 	
 	public UserPreferences getUserPreferences() {
@@ -96,7 +98,7 @@ public class User {
 	}
 	
 	public List<Provider> getTripDeals() {
-		return tripDeals;
+		return new ArrayList<>(tripDeals);
 	}
 
 }
