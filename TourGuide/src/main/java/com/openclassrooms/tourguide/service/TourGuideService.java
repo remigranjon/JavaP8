@@ -1,7 +1,6 @@
 package com.openclassrooms.tourguide.service;
 
 import com.openclassrooms.tourguide.helper.InternalTestHelper;
-import com.openclassrooms.tourguide.responses.AttractionInfoResponse;
 import com.openclassrooms.tourguide.tracker.Tracker;
 import com.openclassrooms.tourguide.user.User;
 import com.openclassrooms.tourguide.user.UserReward;
@@ -15,6 +14,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -63,8 +63,8 @@ public class TourGuideService {
 		return user.getUserRewards();
 	}
 
-	public VisitedLocation getUserLocation(User user) {
-		VisitedLocation visitedLocation = (user.getVisitedLocations().size() > 0) ? user.getLastVisitedLocation()
+	public CompletableFuture<VisitedLocation> getUserLocation(User user) {
+		CompletableFuture<VisitedLocation> visitedLocation = (user.getVisitedLocations().size() > 0) ? CompletableFuture.completedFuture(user.getLastVisitedLocation())
 				: trackUserLocation(user);
 		return visitedLocation;
 	}
@@ -92,11 +92,13 @@ public class TourGuideService {
 		return providers;
 	}
 
-	public VisitedLocation trackUserLocation(User user) {
-		VisitedLocation visitedLocation = gpsUtil.getUserLocation(user.getUserId());
-		user.addToVisitedLocations(visitedLocation);
-		rewardsService.calculateRewards(user);
-		return visitedLocation;
+	public CompletableFuture<VisitedLocation> trackUserLocation(User user) {
+		return CompletableFuture.supplyAsync(() -> {
+        VisitedLocation visitedLocation = gpsUtil.getUserLocation(user.getUserId());
+        user.addToVisitedLocations(visitedLocation);
+        rewardsService.calculateRewards(user);
+        return visitedLocation;
+    });
 	}
 
 	public List<Attraction> getNearByAttractions(VisitedLocation visitedLocation) {

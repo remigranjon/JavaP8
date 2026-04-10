@@ -41,7 +41,7 @@ public class TourGuideController {
     
     @RequestMapping("/getLocation") 
     public VisitedLocation getLocation(@RequestParam String userName) {
-    	return tourGuideService.getUserLocation(getUser(userName));
+    	return tourGuideService.getUserLocation(getUser(userName)).join();
     }
     
     //  TODO: Change this method to no longer return a List of Attractions.
@@ -55,7 +55,7 @@ public class TourGuideController {
         //    Note: Attraction reward points can be gathered from RewardsCentral
     @RequestMapping("/getNearbyAttractions") 
     public List<AttractionInfoResponse> getNearbyAttractions(@RequestParam String userName) {
-    	VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));
+    	VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName)).join();
     	return tourGuideService.getNearByAttractions(visitedLocation).stream().map((Attraction attraction) -> {
 			double distance = rewardsService.getDistance(attraction, visitedLocation.location);
 			return AttractionInfoResponse.builder().attractionName(attraction.attractionName)
