@@ -64,8 +64,6 @@ public class RewardsService {
 						CompletableFuture<UserReward> future = CompletableFuture.supplyAsync(
 								() -> new UserReward(visitedLocation, attraction, getRewardPoints(attraction, user)), rewardsExecutor);
 						futures.add(future);
-						break; // On peut sortir de la boucle des attractions dès qu'on trouve une récompense
-								// pour cette visite
 					}
 				}
 			}
