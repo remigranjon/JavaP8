@@ -21,6 +21,14 @@ jobs:
         cache: maven # Mise en cache des dépendances pour aller plus vite
         cache-dependency-path: 'TourGuide/pom.xml' # Chemin vers le pom.xml pour la mise en cache
 
+    - name: Préparation de l'environnement
+      working-directory: ./TourGuide 
+      run: |
+        mvn install:install-file -Dfile="libs/gpsUtil.jar" -DgroupId=gpsUtil -DartifactId=gpsUtil -Dversion="1.0.0" -Dpackaging=jar  
+        mvn install:install-file -Dfile="libs/RewardCentral.jar" -DgroupId=rewardCentral -DartifactId=rewardCentral -Dversion="1.0.0" -Dpackaging=jar  
+        mvn install:install-file -Dfile="libs/TripPricer.jar" -DgroupId=tripPricer -DartifactId=tripPricer -Dversion="1.0.0" -Dpackaging=jar
+
+
     - name: Build et Tests avec Maven
       # On utilise 'package' pour générer le fichier .jar
       run: mvn -B package --file TourGuide/pom.xml
