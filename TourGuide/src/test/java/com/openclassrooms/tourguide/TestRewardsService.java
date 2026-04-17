@@ -20,7 +20,6 @@ import com.openclassrooms.tourguide.service.TourGuideService;
 import com.openclassrooms.tourguide.user.User;
 import com.openclassrooms.tourguide.user.UserReward;
 
-@Disabled
 public class TestRewardsService {
 
 	@Test

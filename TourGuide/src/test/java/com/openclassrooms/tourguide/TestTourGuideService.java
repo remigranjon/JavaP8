@@ -19,7 +19,6 @@ import com.openclassrooms.tourguide.service.TourGuideService;
 import com.openclassrooms.tourguide.user.User;
 import tripPricer.Provider;
 
-@Disabled
 public class TestTourGuideService {
 
 	@Test

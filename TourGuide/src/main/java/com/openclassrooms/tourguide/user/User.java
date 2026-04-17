@@ -62,7 +62,7 @@ public class User {
 	}
 	
 	public List<VisitedLocation> getVisitedLocations() {
-		return new ArrayList<>(visitedLocations);
+		return new ArrayList<>(visitedLocations); // On retourne une nouvelle liste pour éviter que l'appelant puisse modifier directement la liste interne
 	}
 	
 	public void clearVisitedLocations() {
