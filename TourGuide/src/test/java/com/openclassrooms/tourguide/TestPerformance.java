@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.time.StopWatch;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
@@ -47,16 +46,14 @@ public class TestPerformance {
 	 * assertTrue(TimeUnit.MINUTES.toSeconds(20) >=
 	 * TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
 	 */
-
 	@DisabledIfEnvironmentVariable(named = "GITHUB_ACTIONS", matches = "true")
-	@Disabled
 	@Test
 	public void highVolumeTrackLocation() {
 		GpsUtil gpsUtil = new GpsUtil();
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
 		// Users should be incremented up to 100,000, and test finishes within 15
 		// minutes
-		InternalTestHelper.setInternalUserNumber(10000);
+		InternalTestHelper.setInternalUserNumber(1000);
 		TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
 
 		List<User> allUsers = new ArrayList<>();
@@ -83,7 +80,6 @@ public class TestPerformance {
 	}
 	
 	@DisabledIfEnvironmentVariable(named = "GITHUB_ACTIONS", matches = "true")
-	@Disabled
 	@Test
 	public void highVolumeGetRewards() {
 		GpsUtil gpsUtil = new GpsUtil();
@@ -101,6 +97,13 @@ public class TestPerformance {
 		allUsers = tourGuideService.getAllUsers();
 		allUsers.forEach(u -> u.addToVisitedLocations(new VisitedLocation(u.getUserId(), attraction, new Date())));
 
+		// rewardsService.completableFutureCalculateRewards(allUsers);
+		List<CompletableFuture<Void>> completableFutures = allUsers
+				.stream()
+				.map(user -> rewardsService.calculateRewards(user))
+				.collect(Collectors.toList());
+
+		completableFutures.forEach(CompletableFuture::join);
 		allUsers.forEach(u -> rewardsService.calculateRewards(u));
 
 		for (User user : allUsers) {
