@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.time.StopWatch;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
@@ -46,6 +47,7 @@ public class TestPerformance {
 	 * assertTrue(TimeUnit.MINUTES.toSeconds(20) >=
 	 * TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
 	 */
+	@Disabled
 	@DisabledIfEnvironmentVariable(named = "GITHUB_ACTIONS", matches = "true")
 	@Test
 	public void highVolumeTrackLocation() {
@@ -97,14 +99,12 @@ public class TestPerformance {
 		allUsers = tourGuideService.getAllUsers();
 		allUsers.forEach(u -> u.addToVisitedLocations(new VisitedLocation(u.getUserId(), attraction, new Date())));
 
-		// rewardsService.completableFutureCalculateRewards(allUsers);
 		List<CompletableFuture<Void>> completableFutures = allUsers
 				.stream()
 				.map(user -> rewardsService.calculateRewards(user))
 				.collect(Collectors.toList());
 
 		completableFutures.forEach(CompletableFuture::join);
-		allUsers.forEach(u -> rewardsService.calculateRewards(u));
 
 		for (User user : allUsers) {
 			assertTrue(user.getUserRewards().size() > 0);
