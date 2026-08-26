@@ -37,6 +37,5 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: application-java-21 # Le nom du pack de téléchargement
-        # Le chemin vers le JAR généré par Maven (souvent dans le dossier 'target')
         path: TourGuide/target/*.jar
-        retention-days: 5 # Durée de conservation (optionnel)
+        retention-days: 5
